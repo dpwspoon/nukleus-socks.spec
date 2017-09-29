@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.reaktivity.specification.nukleus.socks.stream;
+package org.reaktivity.specification.nukleus.socks.stream.forward;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.rules.RuleChain.outerRule;
@@ -23,13 +23,14 @@ import org.junit.Test;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+import org.kaazing.k3po.junit.annotation.ScriptProperty;
 import org.kaazing.k3po.junit.annotation.Specification;
 import org.kaazing.k3po.junit.rules.K3poRule;
 
 public class NukleusIT
 {
     private final K3poRule k3po = new K3poRule()
-        .addScriptRoot("scripts", "org/reaktivity/specification/nukleus/socks/streams");
+        .addScriptRoot("scripts", "org/reaktivity/specification/nukleus/socks/streams/forward");
 
     private final TestRule timeout = new DisableOnDebug(new Timeout(5, SECONDS));
 
@@ -37,6 +38,7 @@ public class NukleusIT
     public final TestRule chain = outerRule(k3po).around(timeout);
 
     @Test
+    @ScriptProperty("serverAccept \"nukleus://socks/streams/source\"")
     @Specification({
         "${scripts}/client.connect.send.data/client",
         "${scripts}/client.connect.send.data/server"})

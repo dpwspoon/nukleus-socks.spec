@@ -103,4 +103,7 @@ public class ControlIT
         k3po.notifyBarrier("ROUTED_CLIENT");
         k3po.finish();
     }
+
+    // TODO add tests for destAddrPort
+
 }

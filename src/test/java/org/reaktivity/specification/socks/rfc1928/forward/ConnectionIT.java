@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.reaktivity.specification.socks;
+package org.reaktivity.specification.socks.rfc1928.forward;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.rules.RuleChain.outerRule;
@@ -26,10 +26,10 @@ import org.junit.rules.Timeout;
 import org.kaazing.k3po.junit.annotation.Specification;
 import org.kaazing.k3po.junit.rules.K3poRule;
 
-public class RFC1928IT
+public class ConnectionIT
 {
     private final K3poRule k3po = new K3poRule()
-        .addScriptRoot("scripts", "org/reaktivity/specification/socks");
+        .addScriptRoot("scripts", "org/reaktivity/specification/socks/rfc1928/forward");
 
     private final TestRule timeout = new DisableOnDebug(new Timeout(10, SECONDS));
 

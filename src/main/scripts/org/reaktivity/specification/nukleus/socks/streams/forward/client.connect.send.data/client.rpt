@@ -14,7 +14,7 @@
 # under the License.
 #
 
-property newClientAcceptRef  ${nukleus:newRouteRef()} # external
+property newClientAcceptRef ${nuklei:newReferenceId()} # external scope
 
 connect await ROUTED_CLIENT
         "nukleus://socks/streams/source"
@@ -22,8 +22,14 @@ connect await ROUTED_CLIENT
   option nukleus:window 65536
   option nukleus:transmission "duplex"
 
+# Client forward mode DOES NOT enforce target Nukleus to be TCP
+# Not expecting a TcpBeginExFW
 connected
 
 write "hello world"
 
 read "hello client"
+
+write "data flows as intended"
+
+read "data flows back as intended"

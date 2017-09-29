@@ -14,41 +14,42 @@
 # under the License.
 #
 
-property newServerAcceptRef  ${nukleus:newRouteRef()} # external
+property newServerAcceptRef ${nuklei:newReferenceId()} # external scope
 
-property serverAccept "nukleus://tls/streams/source"
-
-accept "nukleus://tls/streams/source"
-  option nukleus:route  ${newServerAcceptRef}
+connect await ROUTED_SERVER "nukleus://socks/streams/source"
+  option nukleus:route ${newServerAcceptRef}
   option nukleus:window 65536
   option nukleus:transmission "duplex"
-accepted
 connected
 
 ## Write the request bytes for connecting with no-authentication
-read [0x05 0x01 0x00]
+write [0x05]
+write [0x01]
+write [0x00]
 
 ## Read the response, expect success
-write [0x05 0x00]
+read [0x05 0x00]
 
-## Read CONNECT request
-read [0x05] # version: SOCKS v5
-read [0x01] # CONNECT command
-read [0x00] # RSV field
-read [0x03] # Address Type domain name
-read [0x0B] # Length of the FQDN
-read "example.com" # The FQDN
-read [0x1F 0x90] # The destination port
-
-## Write CONNECT response
+## Write CONNECT request
 write [0x05] # version: SOCKS v5
-write [0x00] # CONNECT command
+write [0x01] # CONNECT command
 write [0x00] # RSV field
 write [0x03] # Address Type domain name
 write [0x0B] # Length of the FQDN
 write "example.com" # The FQDN
 write [0x1F 0x90] # The destination port
 
+## Read CONNECT response
+read [0x05] # version: SOCKS v5
+read [0x00] # Succeeded
+read [0x00] # RSV field
+read [0x01] # Address Type domain name
+read [0x7F 0x00 0x00 0x01] # The Bound Server Address
+read [0xEA 0xDB]           # The Bound Server Port
+
+write "hello world"
+read "hello client"
+
 ## Application data
-read "hello world"
-write "hello client"
+write "data flows as intended"
+read "data flows back as intended"

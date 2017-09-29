@@ -18,6 +18,9 @@ property nukleiUR020001N ${nuklei:directory("target/nukleus-itests").controlCapa
 
 property controlUR020001N ${nukleiUR020001N.controlNew("socks")}
 
+property mode "FORWARD"
+property destAddrPort "example.com:8080"
+
 connect await ROUTED_SERVER
         "agrona://stream/bidirectional"
         option agrona:reader ${agrona:manyToOneReader(controlUR020001N.nukleus)}
@@ -33,6 +36,7 @@ read ([0..8]:serverAcceptRefRG010001N)
 read [0x06] "target"
 read ([0..8]:serverConnectRefRG010001N)
 read ${socks:mode(mode)}
+read ${socks:destAddrPort(destAddrPort)}
 
 write [0x40 0x00 0x00 0x02]
 write ${correlationIdUR020001N}

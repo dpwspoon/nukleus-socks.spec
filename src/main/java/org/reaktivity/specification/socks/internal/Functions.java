@@ -15,12 +15,16 @@
  */
 package org.reaktivity.specification.socks.internal;
 
+import java.nio.charset.StandardCharsets;
+
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.kaazing.k3po.lang.el.Function;
 import org.kaazing.k3po.lang.el.spi.FunctionMapperSpi;
 import org.reaktivity.specification.socks.internal.types.SocksMode;
 import org.reaktivity.specification.socks.internal.types.SocksModeFW;
+import org.reaktivity.specification.socks.internal.types.String16FW;
+import org.reaktivity.specification.socks.internal.types.stream.TcpBeginExFW;
 
 public final class Functions
 {
@@ -36,6 +40,82 @@ public final class Functions
         byte[] modeBytes = new byte[modeType.sizeof()];
         modeType.buffer().getBytes(0, modeBytes);
         return modeBytes;
+    }
+
+    @Function
+    public static byte[] destAddrPort(String destAddrPort)
+    {
+        MutableDirectBuffer writeBuffer = new UnsafeBuffer(new byte[1024]);
+        String16FW dapType = new String16FW.Builder()
+            .wrap(writeBuffer, 0, writeBuffer.capacity())
+            .set(destAddrPort, StandardCharsets.UTF_8)
+            .build();
+        byte[] dapBytes = new byte[dapType.sizeof()];
+        dapType.buffer().getBytes(0, dapBytes);
+        return dapBytes;
+    }
+
+    /**
+     * Builds the TcpBeginExFW from given IPv4 addresses
+     * FIXME Should be implemented in tcp.spec nukleus, with tests on both client and server.
+     * FIXME Implementation should pass these tests.
+     *
+     * @param localAddress
+     * @param localPort
+     * @param remoteAddress
+     * @param remotePort
+     * @return A byte array representing the extension ready to be read or written
+     */
+    @Function
+    public static byte[] beginTcpExtensionIpv4(
+        byte[] localAddress,
+        int localPort,
+        byte[] remoteAddress,
+        int remotePort)
+    {
+        MutableDirectBuffer writeBuffer = new UnsafeBuffer(new byte[1024]);
+        TcpBeginExFW beginExFW = new TcpBeginExFW.Builder()
+            .wrap(writeBuffer, 0, writeBuffer.capacity())
+            .localAddress(builderType -> builderType.ipv4Address(builderData -> builderData.set(localAddress)))
+            .localPort(localPort)
+            .remoteAddress(builderType -> builderType.ipv4Address(builderData -> builderData.set(remoteAddress)))
+            .remotePort(remotePort)
+            .build();
+        byte[] tcpBeginExBytes = new byte[beginExFW.sizeof()];
+        beginExFW.buffer().getBytes(0, tcpBeginExBytes);
+        return tcpBeginExBytes;
+    }
+
+    /**
+     * Builds the TcpBeginExFW from given IPv6 addresses
+     * FIXME Should be implemented in tcp.spec nukleus, with tests on both client and server.
+     * FIXME Implementation should pass these tests.
+     *
+     * @param localAddress
+     * @param localPort
+     * @param remoteAddress
+     * @param remotePort
+     * @return
+     */
+    @Function
+    public static byte[] beginTcpExtensionIpv6(
+        byte[] localAddress,
+        int localPort,
+        byte[] remoteAddress,
+        int remotePort)
+    {
+        MutableDirectBuffer writeBuffer = new UnsafeBuffer(new byte[1024]);
+        TcpBeginExFW beginExFW = new TcpBeginExFW.Builder()
+            .wrap(writeBuffer, 0, writeBuffer.capacity())
+            .localAddress(builderType -> builderType.ipv6Address(builderData -> builderData.set(localAddress)))
+            .localPort(localPort)
+            .remoteAddress(builderType -> builderType.ipv6Address(builderData -> builderData.set(remoteAddress)))
+            .remotePort(remotePort)
+            .build();
+        byte[] tcpBeginExBytes = new byte[beginExFW.sizeof()];
+        beginExFW.buffer()
+            .getBytes(0, tcpBeginExBytes);
+        return tcpBeginExBytes;
     }
 
     public static class Mapper extends FunctionMapperSpi.Reflective
