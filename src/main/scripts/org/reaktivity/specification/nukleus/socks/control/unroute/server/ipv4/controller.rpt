@@ -37,8 +37,10 @@ write ${newServerAcceptRef}
 write [0x06] "target"
 write ${newServerConnectRef}
 write 0L
-write [0x01 0x7f 0x00 0x00 0x01]
-write short 8080 # 8080 in network-byte order
+write ${socks:socksAddress()
+             .localhostIpv4()
+             .port(8080)
+             .build()}
 write flush
 
 read 0x40000002

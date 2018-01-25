@@ -15,6 +15,10 @@
 #
 
 property newServerAcceptRef ${nukleus:newRouteRef()} # external scope
+property boundAddress ${socks:socksAddress()
+                             .localhostIpv4()
+                             .port(8080)
+                             .build()}
 
 connect await ROUTED_SERVER "nukleus://socks/streams/source"
   option nukleus:route ${newServerAcceptRef}
@@ -34,10 +38,10 @@ read [0x05 0x00]
 write [0x05] # version: SOCKS v5
 write [0x04] # command not recognized
 write [0x00] # RSV field
-write [0x03] # Address Type domain name
-write [0x0B] # Length of the FQDN
-write "example.com" # The FQDN
-write short 8080 # 8080 in network-byte order
+write ${socks:socksAddress()
+             .domainName("example.com")
+             .port(8080)
+             .build()}
 
 
 ## Read CONNECT response
@@ -45,6 +49,4 @@ read [0x05] # version: SOCKS v5
 read [0x07] # command not supported
 read [0x00] # RSV field
 
-read [0x01] # Address Type domain name
-read [0x00 0x00 0x00 0x00] # The Bound Server Address
-read [0x00 0x00]           # The Bound Server Port (DB)
+read ${boundAddress}

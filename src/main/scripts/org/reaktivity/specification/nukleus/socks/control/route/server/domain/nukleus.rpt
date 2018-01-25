@@ -33,8 +33,10 @@ read 0L
 read [0x06] "target"
 read (long:serverConnectRefRG010001N)
 read [0..8] # authorization
-read [0x03 0x0b] "example.com"
-read short 8080 # 8080 in network-byte order
+read ${socks:socksAddress()
+            .domainName("example.com")
+            .port(8080)
+            .build()}
 
 write 0x40000001
 write ${correlationIdRG010001N}

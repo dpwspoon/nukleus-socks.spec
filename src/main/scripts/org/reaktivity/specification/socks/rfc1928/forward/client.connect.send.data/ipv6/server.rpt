@@ -16,6 +16,10 @@
 
 property newServerAcceptRef ${nukleus:newRouteRef()}
 property newClientConnectRef ${newServerAcceptRef}
+property boundAddress ${socks:socksAddress()
+                             .localhostIpv4()
+                             .port(8080)
+                             .build()}
 
 property serverAccept "nukleus://socks/streams/source"
 
@@ -36,16 +40,16 @@ write [0x05 0x00]
 read [0x05] # version: SOCKS v5
 read [0x01] # CONNECT command
 read [0x00] # RSV field
-read [0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01] #IPv6 ::1
-read short 8080 # 8080 in network-byte order
+read ${socks:socksAddress()
+            .localhostIpv6()
+            .port(8080)
+            .build()}
 
 ## Write CONNECT response
 write [0x05] # version: SOCKS v5
 write [0x00] # Succeeded
 write [0x00] # RSV field
-write [0x01] # Address Type domain name
-write [0x00 0x00 0x00 0x00] # The Bound Server Address
-write [0x00 0x00]           # The Bound Server Port
+write ${boundAddress}
 
 ## Application data
 read "hello world"

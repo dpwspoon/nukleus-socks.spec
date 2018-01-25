@@ -35,8 +35,10 @@ write 0L
 write [0x06] "target"
 write ${newClientConnectRef}
 write 0L # authorization
-write [0x03 0x0b] "example.com"
-write short 8080 # 8080 in network-byte order
+write ${socks:socksAddress()
+             .domainName("example.com")
+             .port(8080)
+             .build()}
 write flush
 
 read 0x40000001
